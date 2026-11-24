@@ -109,7 +109,10 @@ def pick_line(candidates):
 
     Weights follow the judge's order: genuine pride counts most,
     then the concrete scene, then pride earned inside the line,
-    then landing in one read, then freshness.
+    then landing in one read, then freshness. On an exact score
+    tie the shorter line wins: the brief's own tie-break prefers
+    the smaller text, so a shorter line is strictly better when
+    the judge cannot tell two apart.
     """
     weights = (5, 4, 3, 2, 1)
     best = None
@@ -117,7 +120,9 @@ def pick_line(candidates):
     for entry in candidates:
         line, *scores = entry
         score = sum(w * s for w, s in zip(weights, scores))
-        if score > best_score:
+        if score > best_score or (
+            score == best_score and best is not None and len(line) < len(best)
+        ):
             best = line
             best_score = score
     return best
